@@ -21,7 +21,7 @@ you-get的java版本
         //视频地址
         String url="http://arts.cctv.com/2017/07/25/VIDEjhWhUmvouacDVMl1ZnoX170725.shtml";
         DownLoadInfo downLoadInfo = new DownLoadInfo();
-        //是否合并视频
+        //是否合并视频,java发起系统调用,需要配置ffmpeg
         downLoadInfo.setMerger(true);
         //保存路径
         downLoadInfo.setDst("苏东坡/第三集");
