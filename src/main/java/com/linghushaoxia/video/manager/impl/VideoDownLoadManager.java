@@ -30,11 +30,10 @@ public class VideoDownLoadManager implements IVideoDownLoadManager {
 		//根据地址判断目标网站
 		IVideoDownLoadManager videoDownLoadManager = getDownLoadManager(downLoadInfo.getUrl());
 		videoDownLoadManager.downVideo(downLoadInfo);
-		//合并视频,只有当前线程，其余线程执行完毕
-		while(Thread.activeCount()>1){
-			
-		}
 		if (downLoadInfo.isMerger()) {
+			//合并视频,只有当前线程，其余线程执行完毕
+			while(Thread.activeCount()>1){	
+			}
 			merger(downLoadInfo.getDst());
 		}
 		
