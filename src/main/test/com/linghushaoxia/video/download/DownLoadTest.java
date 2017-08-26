@@ -3,7 +3,7 @@ import com.linghushaoxia.video.dto.DownLoadInfo;
 import com.linghushaoxia.video.manager.IVideoDownLoadManager;
 import com.linghushaoxia.video.manager.impl.VideoDownLoadManager;
 
-/**功能说明：基本测试
+/**功能说明：视频下载基本测试
  * @author:linghushaoxia
  * @time:2017年8月25日下午10:37:21
  * @version:1.0
@@ -12,9 +12,12 @@ import com.linghushaoxia.video.manager.impl.VideoDownLoadManager;
 public class DownLoadTest {
 	public static void main(String[] args) {
 		IVideoDownLoadManager downLoadManager = new VideoDownLoadManager();
+		//视频地址
 		String url="http://arts.cctv.com/2017/07/25/VIDEjhWhUmvouacDVMl1ZnoX170725.shtml";
 		DownLoadInfo downLoadInfo = new DownLoadInfo();
+		//是否合并视频,java发起系统调用,需要配置ffmpeg
 		downLoadInfo.setMerger(true);
+		//保存路径
 		downLoadInfo.setDst("苏东坡/第三集");
 		downLoadInfo.setUrl(url);
 		downLoadManager.downVideo(downLoadInfo);
