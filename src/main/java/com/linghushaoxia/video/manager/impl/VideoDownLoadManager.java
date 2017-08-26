@@ -37,8 +37,18 @@ public class VideoDownLoadManager implements IVideoDownLoadManager {
 			merger(downLoadInfo.getDst());
 		}
 		
-		
 	}
+	/**
+	 * 
+	 * 功能说明:根据域名获取对应的下载器
+	 * @param url
+	 * 远程url
+	 * @return IVideoDownLoadManager
+	 * @time:2017年8月26日下午10:49:41
+	 * @author:linghushaoxia
+	 * @exception:
+	 *
+	 */
 	private IVideoDownLoadManager getDownLoadManager(String url){
 		Map<String, String> urlPropertyMap= UrlUtil.urlSplit(url);
 		//根据域名判断
