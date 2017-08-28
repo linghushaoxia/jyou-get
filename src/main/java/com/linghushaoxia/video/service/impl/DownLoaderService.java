@@ -18,9 +18,8 @@ import com.linghushaoxia.video.service.IDownLoaderService;
 public class DownLoaderService implements IDownLoaderService{
 
 	@Override
-	public String downLoadAndSave(String url, String dst) {
+	public void downLoadAndSave(String url, String dst) {
 		downLoadFromUrl(url,dst);
-		return null;
 	}
 
 	@Override
@@ -44,8 +43,11 @@ public class DownLoaderService implements IDownLoaderService{
 	private  void downLoadFromUrl(String url,String savePath) {
 		System.out.println("开始下载:url=" + url);
 		// 获取字节数组
-		byte[] getData = readInputStream(getInputStream(url));
-
+		byte[] fileBytes = readInputStream(getInputStream(url));
+		if (fileBytes==null) {
+		    System.out.println("文件字节为空url="+url);
+		    return ;
+		}
 		// 文件保存位置
 		File saveDir = new File(savePath);
 		/**
@@ -69,7 +71,7 @@ public class DownLoaderService implements IDownLoaderService{
 		FileOutputStream  fileOutputStream = null;
 		try {
 			fileOutputStream= new FileOutputStream(saveDir);
-			fileOutputStream.write(getData);
+			fileOutputStream.write(fileBytes);
 		} catch (Exception e) {
 		}finally{
 			if (fileOutputStream != null) {
@@ -118,6 +120,10 @@ public class DownLoaderService implements IDownLoaderService{
 	 *
 	 */
 	private byte[] readInputStream(InputStream inputStream){
+	    	if (inputStream==null) {
+	    	    System.out.println("输入流为空");
+		    return null;
+		}
 		byte[] buffer = new byte[1024];
 		int len = 0;
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();

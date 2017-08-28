@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.linghushaoxia.video.config.ConfigConst;
 import com.linghushaoxia.video.dto.DownLoadInfo;
 import com.linghushaoxia.video.manager.IVideoDownLoadManager;
 import com.linghushaoxia.video.manager.impl.cntv.CntvVideoDownLoadManager;
@@ -136,10 +137,16 @@ public class VideoDownLoadManager implements IVideoDownLoadManager {
 		builder.append(" ").append(dstPath);
 		//临时文件路径
 		String bash = builder.toString();
-		BashUtil.bashRun(bash);
-		//删除冗余文件
-		for (String path : videoPathList) {
-			FileUtil.delete(path);
+		String exeResult = BashUtil.bash(bash);
+		if (ConfigConst.EXE_SUCCESS.equalsIgnoreCase(exeResult)) {
+		  System.out.println("命令执行成功");
+		    //删除冗余文件
+		  for (String path : videoPathList) {
+		      FileUtil.delete(path);
+		  }   
+		}else {
+		    System.out.println("执行命令失败:"+exeResult);
+		    System.out.println("bash="+bash);		
 		}
 		
 	}
@@ -155,22 +162,30 @@ public class VideoDownLoadManager implements IVideoDownLoadManager {
 	 * @exception:
 	 *
 	 */
-	private void formatTrans(String srcPath){
-		//视频文件路径
-		List<String> videoPathList = new ArrayList<String>();
-		FileUtil.getFilePathList(srcPath, videoPathList,"");
-		videoPathList = FileUtil.sortList(videoPathList);
-		//拼接命令
-		StringBuilder builder = new StringBuilder();
-		//输入文件
-		for(String path:videoPathList){
-			builder.append("ffmpeg -i ").append(path).append(" -c copy -bsf h264_mp4toannexb -f mpegts -y ").append(path+".ts");
-			BashUtil.bashRun(builder.toString());
-			builder.delete(0, builder.length());
-			//删除文件
-			FileUtil.delete(path);
-		}
+    private void formatTrans(String srcPath) {
+	// 视频文件路径
+	List<String> videoPathList = new ArrayList<String>();
+	FileUtil.getFilePathList(srcPath, videoPathList, "");
+	videoPathList = FileUtil.sortList(videoPathList);
+	// 拼接命令
+	StringBuilder builder = new StringBuilder();
+	// 输入文件
+	for (String path : videoPathList) {
+	    builder.append("ffmpeg -i ").append(path)
+		    .append(" -c copy -bsf h264_mp4toannexb -f mpegts -y ")
+		    .append(path + ".ts");
+	    String bash = builder.toString();
+	    String exeResult = BashUtil.bash(bash);
+	    if (ConfigConst.EXE_SUCCESS.equalsIgnoreCase(exeResult)) {
+		// 删除文件
+		FileUtil.delete(path);
+	    } else {
+		System.out.println("执行命令失败:"+exeResult);
+		System.out.println("bash="+bash);
+	    }
+	    builder.delete(0, builder.length());
 	}
+    }
 	/**
 	 * 
 	 * 功能说明:判断芒果tv

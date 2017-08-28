@@ -1,10 +1,11 @@
 package com.linghushaoxia.video.util;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.InputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+
+import com.linghushaoxia.video.config.ConfigConst;
 
 /**功能说明：java执行系统命令
  * bat或者bash脚本命令
@@ -24,91 +25,60 @@ public class BashUtil {
 	 * @exception:
 	 *
 	 */
-	public static String bashRun(String bash){
-		System.out.println("bash="+bash);
-		try {
-			//返回结果
-			StringBuffer result =new StringBuffer();
-			//如果出现问题，看类开头的注释 
-		    BufferedReader read = new BufferedReader(new InputStreamReader(exeBash(bash)));  
-		    String line = null;  
-		    while((line = read.readLine())!=null){  
-		        System.out.println(line); 
-		        result.append(line);
-		    }  
-		    return result.toString();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return ""; 
+    public static String bash(String bash) {
+	// 返回结果
+	String result = "";
+	// 命令
+	String[] cmds = new String[3];
+	// 判断系统类型
+	if (isWindows()) {
+	    cmds[0] = "cmd";
+	    cmds[1] = "/c";
+	    cmds[2] = bash;
+	} else {
+	    cmds[0] = "/bin/sh";
+	    cmds[1] = "-c";
+	    cmds[2] = bash;
 	}
 	/**
-	 * 
-	 * 功能说明:执行bash命令，返回结果(list)
-	 * @param bash
-	 * @return List<String>
-	 * @time:2017年1月21日下午6:39:06
-	 * @author:linghushaoxia
-	 * @exception:
-	 *
+	 * 执行命令并获取结果
 	 */
-	public static List<String> bashRunList(String bash){
-		//返回结果
-		List<String> results = new ArrayList<String>();
-		try {
-		    BufferedReader read = new BufferedReader(new InputStreamReader(exeBash(bash)));  
-		    String line = null;  
-		    while((line = read.readLine())!=null){  
-		        System.out.println(line); 
-		        results.add(line);
-		    }  
-		    return results;
-		} catch (Exception e) {
-			e.printStackTrace();
+	Process pro = null;
+	BufferedInputStream resultInputStream = null;
+	try {
+	    pro = Runtime.getRuntime().exec(cmds);
+	    int resultPro = pro.waitFor();
+	    /**
+	     * 执行失败,则封装详细结果
+	     */
+	    if (resultPro != 0) {
+		resultInputStream = new BufferedInputStream(pro.getErrorStream());
+		//编码取sun.jun.encoding
+		BufferedReader read = new BufferedReader(new InputStreamReader(resultInputStream,System.getProperty("sun.jnu.encoding")));
+		String line = null;
+		StringBuilder builder = new StringBuilder();
+		while ((line = read.readLine()) != null) {
+		    builder.append(line);
 		}
-		
-		return results; 
-	}
-	/**
-	 * 
-	 * 功能说明:执行bash命令,返回执行结果的输入流
-	 * @param bash
-	 * @return InputStream
-	 * @time:2017年1月21日下午6:37:17
-	 * @author:linghushaoxia
-	 * @exception:
-	 *
-	 */
-	private static InputStream exeBash(String bash){
-		//命令
-		String[] cmds=new String[3];
-		//判断系统类型
-		if(isWindows()){
-			cmds[0]="cmd";
-			cmds[1]="/c";
-			cmds[2]=bash;
-		}else {
-			cmds[0]="/bin/sh";
-			cmds[1]="-c";
-			cmds[2]=bash;
-		}
-		//如果出现问题，看类开头的注释
-	    Process pro = null;
+		result = builder.toString();
+	    } else {
+		resultInputStream = new BufferedInputStream(pro.getInputStream());
+		result = ConfigConst.EXE_SUCCESS;
+	    }
+	} catch (Exception e) {
+	    System.out.println("执行命令异常,bash="+bash);
+	    e.printStackTrace();
+	} finally {
+	    if (resultInputStream != null) {
 		try {
-			pro = Runtime.getRuntime().exec(cmds);
-			int result= pro.waitFor();
-			if (result!=0) {
-				System.out.println("执行失败");
-			}else {
-				System.out.println("执行成功");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}  
-	    InputStream in = pro.getInputStream(); 
-		return in;
+		    resultInputStream.close();
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
+	    }
 	}
+	return result;
+    }
 	/**
 	 * 
 	 * 功能说明:判断当前系统是否是windows系统
@@ -119,9 +89,9 @@ public class BashUtil {
 	 *
 	 */
 	public static boolean isWindows(){
-		if(System.getProperty("os.name").contains("dows")||
-				System.getProperty("os.name").contains("Win")||
-				System.getProperty("os.name").contains("win")){
+		if(System.getProperty("os.name").contains("dows")
+			||System.getProperty("os.name").contains("Win")
+			||System.getProperty("os.name").contains("win")){
 			return true;
 			
 		}

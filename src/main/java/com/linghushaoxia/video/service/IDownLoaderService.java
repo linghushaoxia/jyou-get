@@ -13,13 +13,12 @@ public interface IDownLoaderService {
 	 * 远程地址
 	 * @param dst
 	 * 保存到的路径
-	 * @return String
 	 * @time:2017年8月25日下午9:02:45
 	 * @author:linghushaoxia
 	 * @exception:
 	 *
 	 */
-	public String downLoadAndSave(String url,String dst);
+	public void downLoadAndSave(String url,String dst);
 	/**
 	 * 
 	 * 功能说明:下载视频返回字节数组
